@@ -1,0 +1,8 @@
+node_modules
+.next
+*.tsbuildinfo
+next-env.d.ts
+.env*.local
+_scrape
+public/media/hero/hero-original.mp4
+.claude
