@@ -4,13 +4,13 @@ A one-page Next.js rebuild of the tomatin.com homepage in Tomatin's own colours,
 
 ## Run locally
 
-`npm install`, then `npm run dev` (http://127.0.0.1:3000). `npm run build` and `npm start` for production. `npm run typecheck` checks TypeScript. `npm run scrape` re-downloads every image, font and the film into `public/` (then run `scripts/trim-hero.sh`).
+`npm install`, then `npm run dev` (http://127.0.0.1:3000). `npm run build` and `npm start` for production. `npm run typecheck` checks TypeScript. `npm run scrape` re-downloads every image, font and film into `public/`; then run `scripts/trim-hero.sh` and `python3 scripts/prep-media.py`.
 
 ## Pages
 
 | Route | What it is |
 | --- | --- |
-| `/` | The homepage: loader, film hero, story, timeline, brands, recommendations, news, footer |
+| `/` | The homepage: loader, film hero, story, origins with film, interactive history, recommendations, brands, news, footer |
 
 The build produces the homepage plus the framework's own `/_not-found` route and nothing else.
 
@@ -44,7 +44,9 @@ Gold is used for accents, buttons and large type on navy only (it does not reach
 | Hero calls to action | 3 (Discover Our Whisky, Book a Tour, Watch Our Full Film) | 2. "Watch Our Full Film" opens a popup whose video loads lazily and could not be retrieved, so it is left out rather than linked wrongly. A pause control replaces it |
 | Promo banners | 3 (Kurokabegura, Mystery Whisky, Black Friday 2025) | 0. They are shop promotions, and the Black Friday one is stale. The Shop link covers them |
 | History intro | 1 | 1 |
-| Timeline entries | 11 | 6 (1897, 1909, 1974, 1986, 2002, 2022), for page length. Cut: Origins, Recession, 1996, 2013, 2016. They stay on the live site |
+| History intro film | 1 aerial loop (blurry at full width) | 1, shown as a small click-to-play tile so the low resolution is not exposed |
+| Origins entry | 1 | 1 (own block, with the film) |
+| Timeline entries | 11 | 6 as an interactive year picker (1897, 1909, 1974, 1986, 2002, 2022). Cut: Recession, 1996, 2013, 2016 stay on the live site |
 | Recommendations | 6 | 6 |
 | Latest news | 3 | 3 |
 | Brand cards | 4 (from the nav) | 4 |
@@ -58,11 +60,19 @@ Measured in headless Chrome after scrolling the whole page.
 
 | Viewport | Total height | In screens |
 | --- | --- | --- |
-| 1440 x 900 | 6,174px | 6.9 |
-| 768 x 1024 | 7,852px | 7.7 |
-| 375 x 812 | 6,836px | 8.4 |
+| 1440 x 900 | 6,268px | 7.0 |
+| 768 x 1024 | 8,140px | 7.9 |
+| 375 x 812 | 7,828px | 9.6 |
 
-At 375px the timeline and the recommendations become swipeable snap rows, which is what keeps the phone layout near eight screens.
+At 375px the recommendations become a swipeable snap row and the history year rail scrolls sideways.
+
+## Feedback round 1 (client comments, 1 Oct)
+
+- **Header unreadable over the film:** the header now has a navy top scrim whenever it sits on a dark ground, so the logo and menu always read.
+- **More beige and gold, less navy:** the blue colour wash on the hero is gone; the film is graded with a sepia filter towards the brand's beige and gold. Navy is now one content section (brands) plus the footer. Buttons on light grounds are gold.
+- **Their own video mid-page:** the live homepage's aerial film now sits in an "Origins" block as a click-to-play tile overlapping a photograph, with copy beside it (layout after the 818 "The Magic" block). It plays with sound on click, and pauses when scrolled away.
+- **History shorter and interactive:** the six-card grid is a year picker (click, arrow keys, Home/End, previous/next buttons). The photo cross-fades and the copy rises in. 1,475px of height became 851px.
+- **Recommendations above brands**, and every bottle is cropped to its visible bounds and shown at the same height (`scripts/prep-media.py`), so Legacy no longer looks smaller.
 
 ## How it works
 
@@ -79,6 +89,8 @@ At 375px the timeline and the recommendations become swipeable snap rows, which 
 | `card` | timeline, brands, bottles, news, batched | fade and rise 26px, 0.85s, 0.08s stagger |
 | `image` | every photo | clip opens bottom to top (1.15s), then the picture drifts about 10% while scrolling |
 
+- **Interactive history** (`components/Timeline.tsx`): an ARIA tab list of years. All six photos are stacked and cross-fade; the copy swaps with the `heading` move.
+- **Origins film** (`components/Origins.tsx`): click-to-play, native controls once playing, one tile overlapping the photograph.
 - **Header** (`components/chrome.tsx`): frameless, its colour follows the section under it (`data-tone`), hides on scroll down, returns on scroll up.
 - **Menu**: the Menu button opens a full-screen navy panel (curtain wipe, then the links rise; reversed to close). Focus is trapped, Esc closes it, focus returns to the button. Section links scroll through Lenis; the rest open the real tomatin.com URL in a new tab.
 - **Copied interaction** (Maxwell `.l-button` and `.l-link-underline`, measured on maxwellwines.com.au): the button is outlined, 12px 24px, 13px uppercase, `transition 0.3s ease-out`, and fills on hover, with the border moving to the fill. The text link is 4px padding, small uppercase, and a border-top that goes from transparent to the text colour on hover. Both are in `app/globals.css` (`.btn`, `.link-arrow`) with the source values commented. Checked in Chrome: same padding, size, timing and easing.
@@ -90,9 +102,9 @@ At 375px the timeline and the recommendations become swipeable snap rows, which 
 ## Code layout
 
 - `app/` layout (fonts, boot script, noindex, PostHog), page, global CSS (tokens, type scale, buttons)
-- `components/` `Home`, `Loader`, `Hero`, `chrome` (header and menu), `sections` (story, timeline, brands, recommendations, news, footer), `motion`, `ui`
+- `components/` `Home`, `Loader`, `Hero`, `chrome` (header and menu), `sections` (story, recommendations, brands, news, footer), `Origins`, `Timeline`, `motion`, `ui`
 - `lib/` `content.ts` (all copy), `menu.ts`, `logo-paths.ts` (generated), `brand-icons.ts`, `posthog.ts`, `scroll.ts`
-- `scripts/` `scrape-assets.mjs`, `trim-hero.sh`, `build-logo.py`
+- `scripts/` `scrape-assets.mjs`, `trim-hero.sh`, `prep-media.py`, `build-logo.py`
 
 ## Private demo settings
 
