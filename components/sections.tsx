@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { A, Button, Logo, Rich, Social, TextLink } from "@/components/ui";
 import { brandIcons } from "@/lib/brand-icons";
-import { brands, footer, intro, news, recommendations, timeline } from "@/lib/content";
+import { brands, footer, intro, news, recommendations } from "@/lib/content";
 
 /* Every section declares its ground with `data-tone` (dark or light). The header and its text follow it. */
 
@@ -14,7 +14,7 @@ export function Intro() {
           <h2 className="h2" id="story-title" data-reveal="heading"><Rich text={intro.title} /></h2>
           <p className="lead" data-reveal="para">{intro.lead}</p>
           <p className="copy" data-reveal="para">{intro.body}</p>
-          <div data-reveal="label"><Button href={intro.cta.href}>{intro.cta.label}</Button></div>
+          <div data-reveal="label"><Button href={intro.cta.href} tone="gold">{intro.cta.label}</Button></div>
         </div>
         <div className="intro-imgs">
           <div className="frame main" data-image>
@@ -24,33 +24,6 @@ export function Intro() {
             <Image src={intro.images[1].src} alt={intro.images[1].alt} fill sizes="(max-width: 900px) 40vw, 24vw" />
           </div>
         </div>
-      </div>
-    </section>
-  );
-}
-
-export function Timeline() {
-  return (
-    <section id="history" className="section tone-sand" data-tone="light" aria-labelledby="history-title">
-      <div className="wrap">
-        <div className="section-head">
-          <div>
-            <p className="eyebrow" data-reveal="label">{timeline.eyebrow}</p>
-            <h2 className="h2" id="history-title" data-reveal="heading"><Rich text={timeline.title} /></h2>
-          </div>
-        </div>
-        <ol className="tl-grid">
-          {timeline.items.map((it) => (
-            <li key={it.year} className="tl-card" data-reveal="card">
-              <div className="frame" data-image>
-                <Image src={it.image} alt={it.alt} fill sizes="(max-width: 620px) 92vw, (max-width: 900px) 46vw, 30vw" />
-              </div>
-              <p className="tl-year">{it.year}</p>
-              <h3 className="h3">{it.title}</h3>
-              <p>{it.text}</p>
-            </li>
-          ))}
-        </ol>
       </div>
     </section>
   );
@@ -89,7 +62,7 @@ export function Brands() {
 
 export function Recommendations() {
   return (
-    <section id="recommendations" className="section tone-cream" data-tone="light" aria-labelledby="recs-title">
+    <section id="recommendations" className="section tone-sand" data-tone="light" aria-labelledby="recs-title">
       <div className="wrap">
         <div className="section-head">
           <div>
@@ -101,7 +74,7 @@ export function Recommendations() {
         <ul className="rec-grid">
           {recommendations.items.map((r) => (
             <li key={r.name} className="rec-card" data-reveal="card">
-              <A href={r.href} className="rec-bottle" label={r.name}><Image src={r.image} alt="" width={349} height={1024} sizes="(max-width: 620px) 40vw, 18vw" /></A>
+              <A href={r.href} className="rec-bottle" label={r.name}><Image src={r.image} alt="" width={325} height={900} sizes="(max-width: 620px) 40vw, 18vw" /></A>
               <div className="rec-meta"><span>{r.size}</span><span>{r.price}</span></div>
               <h3>{r.name}</h3>
               <p>{r.text}</p>
@@ -116,7 +89,7 @@ export function Recommendations() {
 
 export function News() {
   return (
-    <section id="news" className="section tone-sand" data-tone="light" data-fast aria-labelledby="news-title">
+    <section id="news" className="section tone-cream" data-tone="light" data-fast aria-labelledby="news-title">
       <div className="wrap">
         <div className="section-head">
           <div>

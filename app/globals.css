@@ -70,6 +70,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .btn:hover, .btn:focus-visible { color: var(--btn-hover-text); background-color: var(--btn-hover-bg); border-color: var(--btn-hover-bg); }
 .btn--dark { --btn-text: var(--cream); --btn-border: var(--cream); --btn-hover-bg: var(--gold); --btn-hover-text: var(--navy); }
 .btn--light { --btn-text: var(--navy); --btn-border: var(--navy); --btn-hover-bg: var(--navy); --btn-hover-text: var(--cream); }
+.btn--gold { --btn-text: var(--navy); --btn-border: var(--gold); background: var(--gold); --btn-hover-bg: var(--navy); --btn-hover-text: var(--cream); }
 .btn--solid { --btn-text: var(--navy); --btn-border: var(--gold); background: var(--gold); --btn-hover-bg: var(--cream); --btn-hover-text: var(--navy); }
 /* Maxwell .l-link-underline: 4px vertical padding, uppercase 10.88px / 1.2px tracking, border-top goes from transparent to the text colour on hover. */
 .link-arrow { display: inline-flex; align-items: center; gap: 8px; padding: 4px 0; border-top: 1px solid transparent; font: 500 11px/1.4 var(--f-ui); letter-spacing: 0.12em; text-transform: uppercase; transition: border-color var(--t-hover) var(--ease-hover); }
@@ -89,6 +90,8 @@ html.js-motion .loader { display: grid; pointer-events: auto; }
 
 /* ---------- Header: frameless, colour follows the ground, hides on scroll down ---------- */
 .site-header { position: fixed; inset: 0 0 auto 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; height: var(--header-h); padding: 0 var(--gutter); color: var(--hfg, var(--cream)); transition: transform 0.5s var(--ease), color 0.3s ease-out; }
+.site-header::before { content: ""; position: absolute; inset: 0 0 -48px; z-index: -1; pointer-events: none; opacity: 0; background: linear-gradient(180deg, rgb(18 48 89 / 0.78), rgb(18 48 89 / 0)); transition: opacity 0.3s ease-out; }
+.site-header[data-tone="dark"]::before { opacity: 1; }
 .site-header[data-hidden="true"] { transform: translateY(-110%); }
 .site-header .brand { width: clamp(104px, 10vw, 136px); }
 .site-header nav { display: flex; align-items: center; gap: clamp(16px, 2.4vw, 32px); }
@@ -127,9 +130,10 @@ html.js-motion:not([data-intro="done"]) .site-header { opacity: 0; }
 .hero { position: relative; display: flex; align-items: flex-end; min-height: max(620px, 100svh); padding: calc(var(--header-h) + 40px) var(--gutter) clamp(40px, 6vw, 72px); background: var(--navy); color: var(--cream); overflow: hidden; isolation: isolate; }
 .hero-film { position: absolute; inset: 0; z-index: -2; }
 .hero-film video, .hero-film img { width: 100%; height: 100%; object-fit: cover; }
+/* Grades the film from blue towards the brand's beige and gold */
+.hero-film video { filter: sepia(0.6) saturate(1.25) contrast(1.05) brightness(1.08); }
 /* Keeps the film inside the palette: navy wash over the footage, deeper at the bottom where the type sits */
-.hero::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgb(18 48 89 / 0.5) 0%, rgb(18 48 89 / 0.1) 30%, rgb(18 48 89 / 0.62) 62%, rgb(18 48 89 / 0.92) 100%); }
-.hero-film::after { content: ""; position: absolute; inset: 0; background: var(--navy); mix-blend-mode: color; opacity: 0.5; }
+.hero::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgb(18 48 89 / 0.18) 0%, rgb(18 48 89 / 0) 24%, rgb(18 48 89 / 0.6) 58%, rgb(18 48 89 / 0.9) 100%); }
 .hero-inner { width: 100%; max-width: var(--max); margin: 0 auto; }
 .hero h1 { margin: 14px 0 clamp(20px, 2.4vw, 32px); font: 400 clamp(72px, 10.5vw, 148px)/0.92 var(--f-display); color: var(--gold); letter-spacing: 0; padding-right: 0.1em; }
 .hero-actions { display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: center; }
@@ -153,14 +157,40 @@ html.js-motion:not([data-intro="done"]) .hero-anim { opacity: 0; }
 .intro-imgs .main { aspect-ratio: 3 / 2; }
 .intro-imgs .second { position: absolute; left: -12%; bottom: 0; width: 44%; aspect-ratio: 3 / 2; border: 6px solid var(--cream); }
 
-/* ---------- Timeline ---------- */
-.tl-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(28px, 3vw, 48px) clamp(20px, 2.4vw, 40px); }
-.tl-card .frame { aspect-ratio: 3 / 2; margin-bottom: 20px; }
-.tl-card .frame img { object-position: center 25%; }
-.tl-year { font: 300 clamp(40px, 3.6vw, 52px)/1 var(--f-serif); letter-spacing: -0.02em; }
-.tl-card h3 { margin-top: 8px; }
-.tl-card p { margin-top: 12px; font-size: 16px; line-height: 1.55; color: var(--navy-70); }
-.tl-card { border-top: 1px solid var(--navy-20); padding-top: 18px; }
+/* ---------- Origins: photograph with the film overlapping it, copy beside (layout after the 818 "The Magic" block) ---------- */
+.origins-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); gap: clamp(32px, 6vw, 96px); align-items: center; }
+.origins-media { position: relative; padding-bottom: clamp(24px, 4vw, 56px); }
+.origins-photo { width: 62%; margin-left: auto; aspect-ratio: 528 / 576; }
+.origins-film { position: absolute; left: 0; bottom: 0; width: 66%; aspect-ratio: 640 / 284; background: var(--navy); border: 6px solid var(--sand); overflow: hidden; }
+.origins-film video { width: 100%; height: 100%; object-fit: cover; }
+.play-btn { position: absolute; inset: 0; display: grid; place-items: center; width: 100%; background: rgb(18 48 89 / 0.18); color: var(--cream); transition: background-color var(--t-hover) var(--ease-hover); }
+.play-btn svg { width: 76px; height: 76px; padding: 20px 14px 20px 24px; border: 2px solid currentColor; border-radius: 50%; fill: currentColor; transition: transform var(--t-hover) var(--ease-hover), background-color var(--t-hover) var(--ease-hover), color var(--t-hover) var(--ease-hover); }
+.play-btn:hover { background: rgb(18 48 89 / 0.05); }
+.play-btn:hover svg { transform: scale(1.08); background: var(--gold); border-color: var(--gold); color: var(--navy); }
+.origins-film[data-playing="true"] .play-btn { display: none; }
+.origins-text > * + * { margin-top: 20px; }
+.origins-text .h2 { margin-top: 14px; }
+.origins-text .btn { margin-top: 12px; }
+
+/* ---------- Timeline: pick a year ---------- */
+.tl-rail { display: flex; border-bottom: 1px solid var(--navy-20); margin-bottom: clamp(24px, 3vw, 44px); overflow-x: auto; scrollbar-width: none; }
+.tl-rail::-webkit-scrollbar { display: none; }
+.tl-tab { flex: 1 0 auto; min-width: 84px; padding: 14px 8px 16px 0; text-align: left; font: 300 clamp(24px, 2.4vw, 34px)/1 var(--f-serif); color: var(--navy-70); border-bottom: 3px solid transparent; margin-bottom: -1px; transition: color var(--t-hover) var(--ease-hover), border-color var(--t-hover) var(--ease-hover); }
+.tl-tab:hover { color: var(--navy); }
+.tl-tab[aria-selected="true"] { color: var(--navy); border-bottom-color: var(--gold); }
+.tl-panel { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: clamp(28px, 5vw, 80px); align-items: center; }
+.tl-media { position: relative; aspect-ratio: 3 / 2; overflow: hidden; background: var(--sand); }
+.tl-media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 25%; opacity: 0; transform: scale(1.04); transition: opacity 0.8s var(--ease), transform 1.4s var(--ease); }
+.tl-media img.is-active { opacity: 1; transform: none; }
+.tl-copy { min-height: 300px; }
+.tl-year { font: 300 clamp(64px, 7vw, 108px)/0.95 var(--f-serif); letter-spacing: -0.03em; }
+.tl-copy .h3 { margin-top: 12px; padding-top: 14px; border-top: 2px solid var(--gold); width: fit-content; min-width: 64px; }
+.tl-copy > p:not(.tl-year) { margin-top: 14px; max-width: 32em; color: var(--navy-70); }
+.tl-ctrl { display: flex; align-items: center; gap: 16px; margin-top: 28px; font: 500 12px/1 var(--f-ui); letter-spacing: 0.14em; }
+.round { display: grid; place-items: center; width: 46px; height: 46px; border: 1px solid var(--navy); border-radius: 50%; transition: background-color var(--t-hover) var(--ease-hover), color var(--t-hover) var(--ease-hover); }
+.round svg { width: 16px; height: 16px; }
+.round:first-child svg { transform: scaleX(-1); }
+.round:hover { background: var(--gold); border-color: var(--gold); }
 
 /* ---------- Brands ---------- */
 .brand-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(12px, 1.4vw, 20px); }
@@ -180,7 +210,7 @@ html.js-motion:not([data-intro="done"]) .hero-anim { opacity: 0; }
 /* ---------- Recommendations ---------- */
 .rec-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: clamp(10px, 1.2vw, 18px); }
 .rec-card { display: flex; flex-direction: column; }
-.rec-bottle { display: grid; place-items: end center; height: clamp(250px, 24vw, 340px); padding: 18px 10px 0; background: var(--sand); overflow: hidden; transition: background-color var(--t-hover) var(--ease-hover); }
+.rec-bottle { display: grid; place-items: center; height: clamp(280px, 27vw, 400px); padding: 24px 12px; background: var(--cream); overflow: hidden; transition: background-color var(--t-hover) var(--ease-hover); }
 .rec-bottle img { width: auto; height: 100%; max-height: 100%; object-fit: contain; transition: transform 0.7s var(--ease); }
 .rec-card:hover .rec-bottle img { transform: translateY(-6px); }
 .rec-meta { display: flex; justify-content: space-between; gap: 8px; margin: 14px 0 6px; font: 500 11px/1.3 var(--f-ui); letter-spacing: 0.12em; text-transform: uppercase; }
@@ -220,7 +250,9 @@ html.js-motion:not([data-intro="done"]) .hero-anim { opacity: 0; }
   .intro-grid, .footer-top, .menu-grid { grid-template-columns: 1fr; }
   .menu-grid { min-height: 0; align-content: start; }
   .intro-imgs .second { left: 0; width: 40%; }
-  .tl-grid, .news-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .news-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .origins-grid, .tl-panel { grid-template-columns: 1fr; }
+  .origins-photo { width: 70%; }
   .footer-cols { grid-template-columns: repeat(2, 1fr); }
   .footer-cols > :first-child { grid-column: 1 / -1; }
   .site-header .nav-link { display: none; }
@@ -231,11 +263,12 @@ html.js-motion:not([data-intro="done"]) .hero-anim { opacity: 0; }
   .brand-grid { grid-template-columns: 1fr; }
   .brand-card { aspect-ratio: 16 / 10; }
   /* Long lists become swipeable rows on phones so the page stays short (the row bleeds to the screen edge) */
-  .tl-grid, .rec-grid { display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; margin: 0 calc(var(--gutter) * -1); padding: 0 var(--gutter) 8px; scrollbar-width: none; overscroll-behavior-x: contain; }
-  .tl-grid::-webkit-scrollbar, .rec-grid::-webkit-scrollbar { display: none; }
-  .tl-card { flex: 0 0 80%; scroll-snap-align: start; }
+  .rec-grid { display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; margin: 0 calc(var(--gutter) * -1); padding: 0 var(--gutter) 8px; scrollbar-width: none; overscroll-behavior-x: contain; }
+  .rec-grid::-webkit-scrollbar { display: none; }
   .rec-card { flex: 0 0 56%; scroll-snap-align: start; }
-  .rec-bottle { height: 260px; }
+  .rec-bottle { height: 300px; }
+  .origins-film { width: 78%; }
+  .tl-copy { min-height: 0; }
   .hero-control { position: static; margin-top: 24px; align-self: flex-start; }
   .hero { flex-direction: column; justify-content: flex-end; align-items: stretch; }
   .hero-inner { flex: 0 0 auto; }

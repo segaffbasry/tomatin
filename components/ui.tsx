@@ -26,7 +26,7 @@ export function A({ href, className, children, label }: { href: string; classNam
   return <a href={href} className={className} aria-label={label} {...(ext ? { target: "_blank", rel: "noopener" } : {})}>{children}</a>;
 }
 
-export function Button({ href, children, tone = "light" }: { href: string; children: ReactNode; tone?: "light" | "dark" | "solid" }) {
+export function Button({ href, children, tone = "light" }: { href: string; children: ReactNode; tone?: "light" | "dark" | "solid" | "gold" }) {
   return <A href={href} className={`btn btn--${tone}`}>{children}</A>;
 }
 
