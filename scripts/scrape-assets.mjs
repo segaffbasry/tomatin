@@ -16,7 +16,10 @@ const files = [
   // hero film (Wistia delivery of the homepage loop, 1280x720, 16s)
   ["https://embed.wistia.com/deliveries/c7b26be96a3a6e9a42d78f91097096444c214072.mp4", "public/media/hero/hero-original.mp4"],
   // After download, run scripts/trim-hero.sh to cut the dark opening and create the muted loop + poster.
+  // aerial film used in the origins section (640x284, with audio)
+  ["https://embed.wistia.com/deliveries/588d2bfb2a0ed857ae4b1440d303c7e68f3ada32.mp4", "public/media/film/aerial.mp4"],
   // history timeline
+  [U + "2024/05/origins.webp", "public/media/history/origins.webp"],
   [U + "2024/03/Timeline-1897-copy.webp", "public/media/history/1897.webp"],
   [U + "2024/03/timeline-1909-copy.webp", "public/media/history/1909.webp"],
   [U + "2024/04/timeline-1974-copy.webp", "public/media/history/1974.webp"],

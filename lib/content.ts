@@ -23,6 +23,16 @@ export const intro = {
   ],
 };
 
+// Mid-page story block: copy is the live homepage's "Origins" entry; the film is the aerial loop from the live "Our history" section.
+export const origins = {
+  eyebrow: "Origins",
+  title: "The origins of whisky production in Scotland",
+  text: "The origins of whisky production in Tomatin are hard to be precise about – prior to the opening of the formal distillery which operates today, there is reason to believe that whisky production, albeit illegal, has been an important part of life in the area around Tomatin since the 1700s.",
+  cta: { label: "Book a tour", href: url("/tours/") },
+  image: { src: "/media/history/origins.webp", w: 528, h: 576, alt: "Copper and timber inside the distillery, lit by a window" },
+  film: { src: "/media/film/aerial.mp4", poster: "/media/film/aerial-poster.jpg", label: "Watch the film", alt: "Aerial film of Tomatin Distillery in the Highlands" },
+};
+
 // The live homepage has 11 timeline entries; the six below carry the story. The rest stay on the live site.
 export const timeline = {
   eyebrow: "1897 to 2022",
