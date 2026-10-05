@@ -29,7 +29,7 @@ export const origins = {
   title: "The origins of whisky production in Scotland",
   text: "The origins of whisky production in Tomatin are hard to be precise about – prior to the opening of the formal distillery which operates today, there is reason to believe that whisky production, albeit illegal, has been an important part of life in the area around Tomatin since the 1700s.",
   cta: { label: "Book a tour", href: url("/tours/") },
-  image: { src: "/media/history/origins.webp", w: 528, h: 576, alt: "Copper and timber inside the distillery, lit by a window" },
+  image: { src: "/media/history/origins.webp", w: 474, h: 476, alt: "Copper and timber inside the distillery, lit by a window" },
   film: { src: "/media/film/aerial.mp4", poster: "/media/film/aerial-poster.jpg", label: "Watch the film", alt: "Aerial film of Tomatin Distillery in the Highlands" },
 };
 
@@ -38,7 +38,7 @@ export const timeline = {
   eyebrow: "1897 to 2022",
   title: "Our *history*",
   items: [
-    { year: "1897", title: "Our story begins", image: "/media/history/1897.webp", w: 327, h: 480, alt: "The certificate of incorporation of the Tomatin Spey District Distillery",
+    { year: "1897", title: "Our story begins", image: "/media/history/1897.webp", fit: "contain", w: 327, h: 480, alt: "The certificate of incorporation of the Tomatin Spey District Distillery",
       text: "In 1892 it was announced that the final route of the Highland Railway would pass through Tomatin. With this, local man John MacDougall, born and bred in Tomatin, began planning his distillery. The Tomatin Spey District Distillery was registered on 8th June 1897, however unfortunately it was closed in 1906." },
     { year: "1909", title: "It wasn’t closed for long", image: "/media/history/1909.webp", w: 785, h: 523, alt: "Distillery workers and their families, early twentieth century",
       text: "Luckily, the company was purchased by experienced wine and spirits merchants and reopened as the New Tomatin Distillers Company Ltd. in 1909, bringing the distillery back into operation with 2 stills capable of producing 225,000 litres of alcohol per year." },
@@ -48,7 +48,7 @@ export const timeline = {
       text: "As a result, it did not stay closed for long, and in February 1986 two Japanese companies, Takara Shuzo and Okura & Co., purchased the distillery to form the Tomatin Distillery Co. Ltd., of which Takara Shuzo proudly remains the majority shareholder to this day." },
     { year: "2002", title: "Quality over quantity.", image: "/media/history/2002.webp", w: 720, h: 480, alt: "A copper still inside Tomatin distillery",
       text: "We took the decision to remove some of our unused stills, reducing the total number from 23 to 12 (which remain in situ today) which marks the change in business focus from the mass production for the blended Scotch whisky market to growing our range of single malts." },
-    { year: "2022", title: "To what matters.", image: "/media/history/2022.webp", w: 480, h: 480, alt: "Distillery team at dusk beneath the words A journey shared",
+    { year: "2022", title: "To what matters.", image: "/media/history/2022.webp", fit: "contain", w: 480, h: 480, alt: "Distillery team at dusk beneath the words A journey shared",
       text: "The world has been through a lot in recent years, and we continue to face uncertainty and unrest. But with the unity we have seen from our partners around the world, the devotion from our team and growing support from our loyal customers, we are reminded of what really matters. Our people matter. Our community matters. Our product matters. So we raise a toast to you from Tomatin. To what matters." },
   ],
 };
