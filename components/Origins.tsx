@@ -38,7 +38,7 @@ export function Origins() {
             <video ref={video} src={origins.film.src} poster={origins.film.poster} playsInline preload="none" aria-label={origins.film.alt}
               onPause={() => setPlaying(false)} onEnded={() => { setPlaying(false); if (video.current) { video.current.controls = false; video.current.load(); } }} />
             <button type="button" className="play-btn" onClick={play} aria-label={`${origins.film.label}: ${origins.film.alt}`}>
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" /></svg>
+              <span className="disc"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6v12l9-6z" /></svg></span>
             </button>
           </div>
         </div>
