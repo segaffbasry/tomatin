@@ -60,11 +60,11 @@ Measured in headless Chrome after scrolling the whole page.
 
 | Viewport | Total height | In screens |
 | --- | --- | --- |
-| 1440 x 900 | 6,268px | 7.0 |
-| 768 x 1024 | 8,140px | 7.9 |
-| 375 x 812 | 7,828px | 9.6 |
+| 1440 x 900 | 6,582px | 7.3 |
+| 768 x 1024 | 8,005px | 7.8 |
+| 375 x 812 | 7,779px | 9.6 |
 
-At 375px the recommendations become a swipeable snap row and the history year rail scrolls sideways.
+At 375px the recommendations become a swipeable snap row and the history year rail becomes a row of years that scrolls sideways.
 
 ## Feedback round 1 (client comments, 1 Oct)
 
@@ -73,6 +73,13 @@ At 375px the recommendations become a swipeable snap row and the history year ra
 - **Their own video mid-page:** the live homepage's aerial film now sits in an "Origins" block as a click-to-play tile overlapping a photograph, with copy beside it (layout after the 818 "The Magic" block). It plays with sound on click, and pauses when scrolled away.
 - **History shorter and interactive:** the six-card grid is a year picker (click, arrow keys, Home/End, previous/next buttons). The photo cross-fades and the copy rises in. 1,475px of height became 851px.
 - **Recommendations above brands**, and every bottle is cropped to its visible bounds and shown at the same height (`scripts/prep-media.py`), so Legacy no longer looks smaller.
+
+## Feedback round 2 (client comments, 5 Oct)
+
+- **Play button off-centre, strip under the film:** the video now fills its tile (it was an inline element leaving a gap), and the button is a centred disc with the triangle optically centred inside it. Measured: disc centre equals tile centre.
+- **Logo unreadable while scrolling:** on light sections the header sits on a frosted cream ground with a hairline, so it never collides with the copy under it. On dark sections it keeps the navy top scrim. The hidden header no longer leaves a sliver of scrim behind. This replaces the brief's "no bar or box" on light grounds, at the client's request.
+- **History elevated:** a vertical year rail (the active year has a gold line that fills while the section advances itself every 7s, only while on screen, and never after a visitor takes over), one large photograph with the year set big over it and a slow zoom, and the copy on a card that overlaps the photograph. The 1897 certificate and the 2022 image are small, so they are framed whole on navy instead of enlarged.
+- **Origins photograph:** the source image has transparent bands on its top and right, which showed as a pale ghost. `scripts/prep-media.py` crops them.
 
 ## How it works
 
@@ -89,7 +96,7 @@ At 375px the recommendations become a swipeable snap row and the history year ra
 | `card` | timeline, brands, bottles, news, batched | fade and rise 26px, 0.85s, 0.08s stagger |
 | `image` | every photo | clip opens bottom to top (1.15s), then the picture drifts about 10% while scrolling |
 
-- **Interactive history** (`components/Timeline.tsx`): an ARIA tab list of years. All six photos are stacked and cross-fade; the copy swaps with the `heading` move.
+- **Interactive history** (`components/Timeline.tsx`): an ARIA tab list of years (arrow keys, Home, End). All six photos are stacked and cross-fade; the copy swaps with a short fade and rise. Autoplay is off for reduced motion.
 - **Origins film** (`components/Origins.tsx`): click-to-play, native controls once playing, one tile overlapping the photograph.
 - **Header** (`components/chrome.tsx`): frameless, its colour follows the section under it (`data-tone`), hides on scroll down, returns on scroll up.
 - **Menu**: the Menu button opens a full-screen navy panel (curtain wipe, then the links rise; reversed to close). Focus is trapped, Esc closes it, focus returns to the button. Section links scroll through Lenis; the rest open the real tomatin.com URL in a new tab.
