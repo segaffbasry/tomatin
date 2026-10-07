@@ -4,9 +4,10 @@ import { Header } from "@/components/chrome";
 import { Hero } from "@/components/Hero";
 import { Loader } from "@/components/Loader";
 import { usePageMotion } from "@/components/motion";
-import { Origins } from "@/components/Origins";
-import { Brands, Footer, Intro, News, Recommendations } from "@/components/sections";
-import { Timeline } from "@/components/Timeline";
+import { BrandStage } from "@/components/BrandStage";
+import { Chapters } from "@/components/Chapters";
+import { Footer, News, Recommendations } from "@/components/sections";
+import { Story } from "@/components/Story";
 
 export function Home() {
   usePageMotion();
@@ -16,11 +17,10 @@ export function Home() {
       <Header />
       <main>
         <Hero />
-        <Intro />
-        <Origins />
-        <Timeline />
+        <Story />
+        <Chapters />
         <Recommendations />
-        <Brands />
+        <BrandStage />
         <News />
       </main>
       <Footer />

@@ -9,6 +9,8 @@ export const hero = {
   poster: "/media/hero/poster.jpg",
   primary: { label: "Discover Our Whisky", href: url("/tomatin/our-whisky/") },
   secondary: { label: "Book a Tour", href: url("/tours/") },
+  // Live conditions at the distillery (Open-Meteo, keyless). Coordinates of Tomatin Distillery, Inverness-shire.
+  place: { name: "Tomatin Distillery", lat: 57.3366, lon: -4.0127, latLabel: "57.34° N", lonLabel: "4.01° W" },
 };
 
 export const intro = {
@@ -17,16 +19,16 @@ export const intro = {
   lead: "It was always our goal to provide a home for our dedicated craftsmen and their families. Working at Tomatin, even in today’s modern world, is more than just a job. It’s a way of life.",
   body: "Whisky production has been central to the way of life in this area most probably since the 15th century and certainly since 1897 when the first formal distillery on the site was established.",
   cta: { label: "Book a tour", href: url("/tours/") },
-  images: [
-    { src: "/media/history/1909.webp", w: 785, h: 523, alt: "Distillery workers and their families, early twentieth century" },
-    { src: "/media/history/2002.webp", w: 720, h: 480, alt: "A copper still inside Tomatin distillery" },
-  ],
+  image: { src: "/media/history/1909.webp", w: 785, h: 523, alt: "Distillery workers and their families, early twentieth century" },
+  // Full-bleed landscape between the two halves of the story (high-resolution original of the live "To What Matters" menu image)
+  landscape: { src: "/media/story/moor.webp", w: 2560, h: 1707, alt: "Heather and grasses on the moor above Tomatin under a soft sky", caption: "Highland single malt Scotch whisky" },
 };
 
 // Mid-page story block: copy is the live homepage's "Origins" entry; the film is the aerial loop from the live "Our history" section.
 export const origins = {
   eyebrow: "Origins",
   title: "The origins of whisky production in Scotland",
+  stills: { src: "/media/story/stills.webp", w: 1136, h: 531, alt: "A stillman checking the copper stills" },
   text: "The origins of whisky production in Tomatin are hard to be precise about – prior to the opening of the formal distillery which operates today, there is reason to believe that whisky production, albeit illegal, has been an important part of life in the area around Tomatin since the 1700s.",
   cta: { label: "Book a tour", href: url("/tours/") },
   image: { src: "/media/history/origins.webp", w: 474, h: 476, alt: "Copper and timber inside the distillery, lit by a window" },
@@ -59,10 +61,10 @@ export const brands = {
   title: "Our *whisky*",
   cta: { label: "Discover Our Whisky", href: url("/tomatin/our-whisky/") },
   items: [
-    { name: "Tomatin", tag: "Highland single malt", text: "Unpeated, light, soft and fruity.", href: url("/tomatin/"), image: "/media/brands/tomatin-2.webp", alt: "Inside Tomatin distillery, warm light on copper and casks", kind: "photo" },
-    { name: "Cù Bòcan", tag: "Lightly peated single malt", text: "Focusing on unusual cask maturations, this brand has gone from strength to strength.", href: url("/cu-bocan/"), image: "/media/brands/cu-bocan.webp", alt: "Casks stamped Cù Bòcan", kind: "photo" },
-    { name: "The Antiquary", tag: "Premium blended Scotch whisky", text: "Widening our brands portfolio since 1996.", href: url("/the-antiquary/"), image: "/media/brands/antiquary-2.webp", alt: "The Antiquary 21 Year Old bottle and box", kind: "photo" },
-    { name: "Shirakawa", tag: "Japanese", text: "Uncover the Shirakawa story.", href: url("/shirakawa/"), image: "/media/brands/shirakawa.webp", alt: "Ink drawing of a Japanese garden and temple", kind: "line" },
+    { name: "Tomatin", tag: "Highland single malt", text: "Unpeated, light, soft and fruity.", href: url("/tomatin/"), bg: "/media/brands/tomatin-distillery.jpg", image: "/media/story/stills.webp", alt: "Inside Tomatin distillery, warm light on copper and casks", kind: "photo" },
+    { name: "Cù Bòcan", tag: "Lightly peated single malt", text: "Focusing on unusual cask maturations, this brand has gone from strength to strength.", href: url("/cu-bocan/"), bg: "/media/brands/cu-bocan-life.webp", image: "/media/brands/cu-bocan.webp", alt: "Casks stamped Cù Bòcan", kind: "photo" },
+    { name: "The Antiquary", tag: "Premium blended Scotch whisky", text: "Widening our brands portfolio since 1996.", href: url("/the-antiquary/"), bg: "/media/brands/antiquary-2.webp", image: "/media/brands/antiquary-2.webp", alt: "The Antiquary 21 Year Old bottle and box", kind: "photo" },
+    { name: "Shirakawa", tag: "Japanese", text: "Uncover the Shirakawa story.", href: url("/shirakawa/"), bg: "/media/brands/shirakawa.webp", image: "/media/brands/shirakawa.webp", alt: "Ink drawing of a Japanese garden and temple", kind: "line" },
   ],
 };
 

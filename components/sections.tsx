@@ -1,64 +1,9 @@
 import Image from "next/image";
 import { A, Button, Logo, Rich, Social, TextLink } from "@/components/ui";
 import { brandIcons } from "@/lib/brand-icons";
-import { brands, footer, intro, news, recommendations } from "@/lib/content";
+import { footer, news, recommendations } from "@/lib/content";
 
 /* Every section declares its ground with `data-tone` (dark or light). The header and its text follow it. */
-
-export function Intro() {
-  return (
-    <section id="story" className="section tone-cream" data-tone="light" aria-labelledby="story-title">
-      <div className="wrap intro-grid">
-        <div className="intro-text">
-          <p className="eyebrow" data-reveal="label">{intro.eyebrow}</p>
-          <h2 className="h2" id="story-title" data-reveal="heading"><Rich text={intro.title} /></h2>
-          <p className="lead" data-reveal="para">{intro.lead}</p>
-          <p className="copy" data-reveal="para">{intro.body}</p>
-          <div data-reveal="label"><Button href={intro.cta.href} tone="gold">{intro.cta.label}</Button></div>
-        </div>
-        <div className="intro-imgs">
-          <div className="frame main" data-image>
-            <Image src={intro.images[0].src} alt={intro.images[0].alt} fill sizes="(max-width: 900px) 92vw, 52vw" />
-          </div>
-          <div className="frame second" data-image>
-            <Image src={intro.images[1].src} alt={intro.images[1].alt} fill sizes="(max-width: 900px) 40vw, 24vw" />
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-export function Brands() {
-  return (
-    <section id="brands" className="section tone-navy" data-tone="dark" aria-labelledby="brands-title">
-      <div className="wrap">
-        <div className="section-head">
-          <div>
-            <p className="eyebrow" data-reveal="label">{brands.eyebrow}</p>
-            <h2 className="h2" id="brands-title" data-reveal="heading"><Rich text={brands.title} /></h2>
-          </div>
-          <div data-reveal="label"><Button href={brands.cta.href} tone="dark">{brands.cta.label}</Button></div>
-        </div>
-        <ul className="brand-grid">
-          {brands.items.map((b) => (
-            <li key={b.name} data-reveal="card">
-              <A href={b.href} className={`brand-card${b.kind === "line" ? " brand-card--line" : ""}`}>
-                {b.kind === "line"
-                  ? <span className="line-art" role="img" aria-label={b.alt} style={{ ["--mask" as string]: `url(${b.image})` }} />
-                  : <span className="bg"><Image src={b.image} alt={b.alt} fill sizes="(max-width: 620px) 92vw, (max-width: 1180px) 46vw, 24vw" /></span>}
-                <span className="tag">{b.tag}</span>
-                <h3>{b.name}</h3>
-                <p>{b.text}</p>
-                <span className="link-arrow">Explore</span>
-              </A>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </section>
-  );
-}
 
 export function Recommendations() {
   return (
@@ -98,18 +43,30 @@ export function News() {
           </div>
           <div data-reveal="label"><TextLink href={news.cta.href}>{news.cta.label}</TextLink></div>
         </div>
-        <ul className="news-grid">
-          {news.items.map((n) => (
-            <li key={n.href} className="news-card" data-reveal="card">
-              <A href={n.href} label={n.title}>
-                <div className="frame" data-image><Image src={n.image} alt={n.alt} fill sizes="(max-width: 620px) 92vw, (max-width: 900px) 46vw, 30vw" /></div>
-              </A>
-              <time dateTime={n.iso}>{n.date}</time>
-              <h3><A href={n.href}>{n.title}</A></h3>
-              <TextLink href={n.href} label={`Find out more: ${n.title}`}>Find out more</TextLink>
-            </li>
+        <div className="news-layout">
+          {news.items.slice(0, 1).map((n) => (
+            <article key={n.href} className="news-feature" data-reveal="card">
+              <A href={n.href} label={n.title} className="news-feature-pic"><div className="frame" data-image><Image src={n.image} alt={n.alt} fill sizes="(max-width: 900px) 92vw, 50vw" /></div></A>
+              <div className="news-feature-body">
+                <time dateTime={n.iso}>{n.date}</time>
+                <h3 className="statement statement--sm"><A href={n.href}>{n.title}</A></h3>
+                <TextLink href={n.href} label={`Read the article: ${n.title}`}>Read the article</TextLink>
+              </div>
+            </article>
           ))}
-        </ul>
+          <ul className="news-list">
+            {news.items.slice(1).map((n) => (
+              <li key={n.href} className="news-row" data-reveal="card">
+                <A href={n.href} label={n.title} className="news-thumb"><div className="frame"><Image src={n.image} alt={n.alt} fill sizes="(max-width: 620px) 40vw, 200px" /></div></A>
+                <div>
+                  <time dateTime={n.iso}>{n.date}</time>
+                  <h3><A href={n.href}>{n.title}</A></h3>
+                  <TextLink href={n.href} label={`Read the article: ${n.title}`}>Read the article</TextLink>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </section>
   );
