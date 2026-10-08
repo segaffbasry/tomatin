@@ -10,7 +10,7 @@ A one-page Next.js rebuild of the tomatin.com homepage in Tomatin's own colours,
 
 | Route | What it is |
 | --- | --- |
-| `/` | The homepage: loader, cover (beige bar of live conditions, script statement, the film in an arch that opens on scroll), story (statement, moor strip, origins with film), history deck, recommendations, brand stage, news, footer |
+| `/` | The homepage: loader, framed cover with four chapters (the film first), story (statement, moor strip, origins with film), history deck, recommendations, brand stage, news, footer |
 
 The build produces the homepage plus the framework's own `/_not-found` route and nothing else.
 
@@ -60,9 +60,9 @@ Measured in headless Chrome after scrolling the whole page.
 
 | Viewport | Total height | In screens |
 | --- | --- | --- |
-| 1440 x 900 | 9,351px (7,101px of content plus 2,250px of pinned scroll) | 10.4 (7.9 without the pin) |
-| 768 x 1024 | 9,084px | 8.9 |
-| 375 x 812 | 7,821px | 9.6 |
+| 1440 x 900 | 9,349px (7,099px of content plus 2,250px of pinned scroll) | 10.4 (7.9 without the pin) |
+| 768 x 1024 | 8,922px | 8.7 |
+| 375 x 812 | 7,467px | 9.2 |
 
 From 900px wide up, the history deck pins and uses half a screen of scroll per year (5 steps). That pinned distance is scroll time rather than content, and it snaps to each year, but it is counted above. Below 900px nothing pins: the deck is swiped instead. At 375px the recommendations also become a swipeable snap row.
 
@@ -100,10 +100,18 @@ New references: moncalisse.com and imperialebolgheri.com. Both were studied in h
 - **Header tone fix:** the tone detector matched the header itself (it carries `data-tone` too), so at the very top it could keep a stale tone. It now only reads the page's sections.
 - Everything after the cover is unchanged, as asked.
 
+## Feedback round 5 (8 Oct: the arch cover "is not very elegant"; reference themacallan.com)
+
+The Macallan was read in headless Chrome. Its date-of-birth gate was hidden in that local render only; nothing was entered. Measured: a white 96px header with the menu on the left, the wordmark centred and icons on the right; a hero framed on the page with a 32px margin and square corners, holding a carousel of four chapters; each chapter a small uppercase label, a restrained 32px serif title and one outline button at the bottom left; numbered indicators at the bottom centre; centred section headings below.
+
+- **Cover:** the arch, the beige bar and the oversized script are gone. The cover is now a framed picture on cream (the frame keeps a 12 to 32px margin, square corners) holding four chapters: the brand film ("To what *matters*", Discover our whisky), the 2011 Single Cask release, Distillery Tours and Our Environment, all Tomatin's own titles and links. Each has a small label, a quiet light serif title and one button. The chapters advance every 7s with a gold line filling beside the current number; hovering or focusing pauses them, choosing one stops them, and they never advance with reduced motion. The film plays only while its chapter shows. The live conditions are reduced to a small caption in the frame's corner.
+- **Header:** symmetric, with the menu on the left, the wordmark centred and the shop on the right.
+- Everything after the cover is unchanged.
+
 ## How it works
 
 - **Loader** (`components/Loader.tsx`): built from the logo's own vectors, and the wordmark is made of letters, so the build is letter by letter. The letters of TOMATIN rise one after another (0.1 to 0.85s), the swash and the rule draw, DISTILLERY wipes open with a clip, then a short hold. At 1.25s the handover happens and a navy curtain wipes up off the hero while the mark fades. One GSAP timeline, 1.81s measured in Chrome (start at 38ms, end at 1,845ms). The loader is server-rendered, so it covers the page from the first frame; its ground is the cover's own cream with the mark in navy, so there is no colour jump. Handover removes `is-loading`, sets `data-intro="done"` and fires `intro:done`; the hero entrance and the header wait for that event, so the curtain and the hero overlap. Lenis is stopped until handover. A 3s guard hands over anyway if anything stalls, and a 6s safety in the boot script releases the page if hydration never finishes. Reduced motion skips it (it is hidden in CSS), and `<noscript>` hides it.
-- **Cover** (`components/Hero.tsx`): with motion allowed the film is laid across the whole section and clipped to the arch, measured from a placeholder in the grid (`inset(top right bottom left round r r 0 0)`, recomputed on resize). A scrubbed tween takes the clip to the full section between the top of the page and the cover's bottom reaching 35% of the screen. With reduced motion or without JavaScript the film simply sits in its arch (CSS border radius). The film is graded toward the palette with a sepia filter, muted, looping, paused off screen, with a pause control and a local poster. The beige bar fetches the current weather from Open-Meteo (no key; the request carries only the distillery coordinates) and keeps the place, coordinates and Tomatin time if the request fails.
+- **Cover** (`components/Hero.tsx`): four stacked layers cross-fade (1.1s) with the picture settling from scale 1.06; the copy for each chapter rises in. ARIA tabs (arrow keys) pick a chapter. The entrance opens the frame from a 7% inset as the loader hands over; on scroll the picture drifts and the copy lifts. The caption fetches the temperature from Open-Meteo (no key; only the distillery coordinates) and keeps the place and Tomatin time if that fails.
 - **Smooth scroll and reveals** (`components/motion.tsx`): Lenis on the GSAP ticker, synced to ScrollTrigger. Anchor links go through Lenis. Overlays stop it.
 - **Reveal moves**, each played once on the curve `tm` = `cubic-bezier(0.15, 0.75, 0.5, 1)` (Maxwell's own). Sections marked `data-fast` use 75% of the duration.
 
@@ -119,7 +127,7 @@ New references: moncalisse.com and imperialebolgheri.com. Both were studied in h
 - **History deck** (`components/Chapters.tsx`): one render function places every print from a continuous position (incoming prints rise from below the screen and straighten to their angle with the picture settling from scale 1.25, the current one drops back, shrinks slightly and dims under the next). From 900px wide with motion allowed, a ScrollTrigger pins the section for 5 half-screens of scroll, scrubbed and snapping to each year; the year buttons scroll there through Lenis. Below 900px or with reduced motion nothing pins, and swipe, the arrows or the years move the deck. Without JavaScript only the first print shows.
 - **Story** (`components/Story.tsx`): statement, columns and photograph; the moor strip; the origins columns with the click-to-play aerial film (native controls once playing, pauses when scrolled away).
 - **Brand stage** (`components/BrandStage.tsx`): ARIA tabs (arrow keys). The background photographs cross-fade under a navy gradient; Shirakawa, being an illustration, shows as cream line art on navy. The card re-opens with a clip from the bottom on each change.
-- **Header** (`components/chrome.tsx`): its colour follows the section under it (`data-tone` on the page's sections), frosted cream over light sections and a navy scrim over dark ones, hides on scroll down, returns on scroll up.
+- **Header** (`components/chrome.tsx`): menu, centred wordmark, shop. Its colour follows the section under it (`data-tone` on the page's sections), frosted cream over light sections and a navy scrim over dark ones, hides on scroll down, returns on scroll up.
 - **Menu**: the Menu button opens a full-screen navy panel that drops in tilted 6deg and straightens (Imperiale's curve), then the links rise; reversed to close. Focus is trapped, Esc closes it, focus returns to the button. Section links scroll through Lenis; the rest open the real tomatin.com URL in a new tab.
 - **Copied interaction** (Maxwell `.l-button` and `.l-link-underline`, measured on maxwellwines.com.au): the button is outlined, 12px 24px, 13px uppercase, `transition 0.3s ease-out`, and fills on hover, with the border moving to the fill. The text link is 4px padding, small uppercase, and a border-top that goes from transparent to the text colour on hover. Both are in `app/globals.css` (`.btn`, `.link-arrow`) with the source values commented. Checked in Chrome: same padding, size, timing and easing.
 - **Imagery:** the hero is the brand film; the story carries the 1909 photograph, the moor and the stills; the history deck, bottles, brand stage and news follow.
