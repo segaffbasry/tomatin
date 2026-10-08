@@ -26,7 +26,8 @@ export function usePageMotion() {
     const root = document.documentElement;
     const reduced = reducedMotion();
     const header = document.querySelector<HTMLElement>(".site-header");
-    const tones = Array.from(document.querySelectorAll<HTMLElement>("[data-tone]"));
+    /* Grounds of the page only: the header carries data-tone itself and must not match its own position. */
+    const tones = Array.from(document.querySelectorAll<HTMLElement>("main [data-tone], footer[data-tone]"));
     let lenis: Lenis | null = null;
     let tick: ((time: number) => void) | null = null;
 

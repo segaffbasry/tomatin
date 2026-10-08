@@ -8,8 +8,8 @@ import { hero } from "@/lib/content";
 
 type Now = { t: number; wind: number; hum: number } | null;
 
-/* Live conditions at the distillery, after the vineyard widget on moncalisse.com. Open-Meteo needs no key and sends no visitor data.
-   If the request fails the widget still shows the place, coordinates and local time. */
+/* Live conditions at the distillery, after the vineyard weather card on moncalisse.com, set as a quiet line in the beige bar.
+   Open-Meteo needs no key and sends no visitor data. If the request fails the bar still shows the place, coordinates and local time. */
 function Conditions() {
   const [now, setNow] = useState<Now>(null);
   const [time, setTime] = useState("");
@@ -26,19 +26,27 @@ function Conditions() {
     return () => { ctrl.abort(); window.clearInterval(id); };
   }, []);
   return (
-    <div className="conditions" aria-label={`Now at ${hero.place.name}`}>
-      <p className="conditions-place">{hero.place.name}<span>{hero.place.latLabel} · {hero.place.lonLabel}</span></p>
-      <p className="conditions-temp">{now ? `${now.t.toFixed(1)}°C` : "—"}<span>{time}</span></p>
-      <p className="conditions-meta"><span>{now ? `${now.wind.toFixed(1)} m/s` : "wind"}</span><span>{now ? `${Math.round(now.hum)}%` : "humidity"}</span></p>
+    <div className="cover-bar-inner" aria-label={`Now at ${hero.place.name}`}>
+      <p className="cover-place"><span className="dot" aria-hidden="true" />{hero.place.name}<span className="cover-coords">{hero.place.latLabel}, {hero.place.lonLabel}</span></p>
+      <p className="cover-now">
+        {now && <span className="cover-temp">{now.t.toFixed(1)}°C</span>}
+        {now && <span className="cover-extra">Wind {now.wind.toFixed(1)} m/s</span>}
+        {now && <span className="cover-extra">Humidity {Math.round(now.hum)}%</span>}
+        <span>{time} in Tomatin</span>
+      </p>
     </div>
   );
 }
 
-/* One screen: the brand film full bleed, graded toward the palette, with the statement over it.
-   Muted, loops, pauses off screen, has a pause control and a local poster. The entrance starts on `intro:done`.
-   On scroll the film settles into an inset frame on cream (after the landscape on moncalisse.com), handing over to the story. */
+/* The front cover. Not their full-bleed film: a cream page with a beige bar of live conditions under the header, the script
+   statement and actions on the left, and the brand film playing inside a tall arch on the right, like a still-house window.
+   With motion allowed the film is laid full-bleed underneath and clipped to the arch; scrolling opens the arch out to the
+   whole section before the story begins. Without that (reduced motion, no JavaScript) the film simply stays in its arch.
+   Muted, loops, pauses off screen, has a pause control and a local poster. The entrance starts on `intro:done`. */
 export function Hero() {
   const stage = useRef<HTMLElement>(null);
+  const slot = useRef<HTMLDivElement>(null);
+  const film = useRef<HTMLDivElement>(null);
   const video = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
   const manualPause = useRef(false);
@@ -62,27 +70,40 @@ export function Hero() {
     return () => io.disconnect();
   }, []);
 
-  /* Entrance (waits for the loader handover so both overlap), then the scroll-out settle. */
   useEffect(() => {
-    const el = stage.current;
-    if (!el || reducedMotion()) return;
+    const el = stage.current, s = slot.current, f = film.current;
+    if (!el || !s || !f || reducedMotion()) return;
     gsap.registerPlugin(ScrollTrigger);
-    const film = el.querySelector(".hero-film");
-    let settle: gsap.core.Timeline | null = null;
+
+    /* The arch, expressed as a clip on the full-bleed film: the slot's edges measured from the section's edges. */
+    const arch = () => {
+      const h = el.getBoundingClientRect(), r = s.getBoundingClientRect();
+      const rad = r.width / 2;
+      return `inset(${r.top - h.top}px ${h.right - r.right}px ${h.bottom - r.bottom}px ${r.left - h.left}px round ${rad}px ${rad}px 0px 0px)`;
+    };
+    el.classList.add("is-open-able");
+    gsap.set(f, { clipPath: arch() });
+
+    let open: gsap.core.Tween | null = null;
     const run = () => {
       gsap.timeline()
-        .fromTo(film, { opacity: 0, scale: 1.08 }, { opacity: 1, scale: 1, duration: 1.8, ease: "tm" }, 0)
-        .fromTo(el.querySelectorAll(".hero-copy > *"), { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 1, stagger: 0.1, ease: "tm", clearProps: "transform" }, 0.1)
-        .fromTo(el.querySelectorAll(".hero-side > *"), { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.8, stagger: 0.08, ease: "tm" }, 0.6);
-      settle = gsap.timeline({ scrollTrigger: { trigger: el, start: "top top", end: "bottom top", scrub: true } })
-        .to(el, { backgroundColor: "#fef9ec", ease: "none", duration: 0.2 }, 0)
-        .fromTo(film, { clipPath: "inset(0% 0% 0% 0%)" }, { clipPath: "inset(6% 4% 14% 4%)", ease: "none" }, 0)
-        .to(el.querySelector(".hero-inner"), { y: -80, opacity: 0, ease: "none" }, 0)
-        .to(el.querySelector(".hero-side"), { y: -60, opacity: 0, ease: "none" }, 0);
+        .fromTo(f, { opacity: 0 }, { opacity: 1, duration: 1.2, ease: "tm" }, 0)
+        .fromTo(f.querySelector("video"), { scale: 1.12 }, { scale: 1, duration: 2, ease: "tm" }, 0)
+        .fromTo(el.querySelectorAll(".cover-copy > *"), { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 1, stagger: 0.09, ease: "tm", clearProps: "transform" }, 0.1)
+        .fromTo(el.querySelector(".cover-bar"), { yPercent: -100, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 0.8, ease: "tm" }, 0.2);
+      open = gsap.fromTo(f, { clipPath: arch }, {
+        clipPath: "inset(0px 0px 0px 0px round 0px 0px 0px 0px)",
+        ease: "none",
+        scrollTrigger: {
+          trigger: el, start: "top top", end: "bottom 35%", scrub: true, invalidateOnRefresh: true,
+          onUpdate: (self) => { el.dataset.tone = self.progress > 0.45 ? "dark" : "light"; },
+        },
+      });
+      gsap.to(el.querySelector(".cover-copy"), { opacity: 0, y: -60, ease: "none", scrollTrigger: { trigger: el, start: "top top", end: "40% top", scrub: true } });
     };
     if (document.documentElement.dataset.intro === "done") run();
     else document.addEventListener("intro:done", run, { once: true });
-    return () => { document.removeEventListener("intro:done", run); settle?.scrollTrigger?.kill(); settle?.kill(); };
+    return () => { document.removeEventListener("intro:done", run); open?.scrollTrigger?.kill(); open?.kill(); el.classList.remove("is-open-able"); };
   }, []);
 
   const toggle = () => {
@@ -92,27 +113,27 @@ export function Hero() {
   };
 
   return (
-    <section ref={stage} className="hero" id="top" data-tone="dark" aria-label="Introduction">
-      <div className="hero-film">
-        <video ref={video} src={hero.film} poster={hero.poster} muted loop playsInline preload="auto" aria-hidden="true"
-          onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} />
-      </div>
-      <div className="hero-inner hero-anim">
-        <div className="hero-copy">
+    <section ref={stage} className="cover" id="top" data-tone="light" aria-label="Introduction">
+      <div className="cover-bar hero-anim"><Conditions /></div>
+      <div className="cover-grid">
+        <div className="cover-copy hero-anim">
           <p className="eyebrow">{hero.eyebrow}</p>
           <h1>{hero.title}</h1>
           <div className="hero-actions">
-            <Button href={hero.primary.href} tone="solid">{hero.primary.label}</Button>
-            <Button href={hero.secondary.href} tone="dark">{hero.secondary.label}</Button>
+            <Button href={hero.primary.href} tone="gold">{hero.primary.label}</Button>
+            <Button href={hero.secondary.href} tone="light">{hero.secondary.label}</Button>
+          </div>
+          <button type="button" className="hero-control" onClick={toggle} aria-pressed={!playing} aria-label={playing ? "Pause background film" : "Play background film"}>
+            <svg viewBox="0 0 10 12" aria-hidden="true">{playing ? <path d="M0 0h3.5v12H0zM6.5 0H10v12H6.5z" /> : <path d="M0 0l10 6-10 6z" />}</svg>
+            <span>{playing ? "Pause film" : "Play film"}</span>
+          </button>
+        </div>
+        <div className="cover-slot" ref={slot}>
+          <div className="cover-film" ref={film}>
+            <video ref={video} src={hero.film} poster={hero.poster} muted loop playsInline preload="auto" aria-hidden="true"
+              onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} />
           </div>
         </div>
-      </div>
-      <div className="hero-side hero-anim">
-        <Conditions />
-        <button type="button" className="hero-control" onClick={toggle} aria-pressed={!playing} aria-label={playing ? "Pause background film" : "Play background film"}>
-          <svg viewBox="0 0 10 12" aria-hidden="true">{playing ? <path d="M0 0h3.5v12H0zM6.5 0H10v12H6.5z" /> : <path d="M0 0l10 6-10 6z" />}</svg>
-          <span>{playing ? "Pause film" : "Play film"}</span>
-        </button>
       </div>
     </section>
   );

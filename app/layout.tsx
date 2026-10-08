@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   icons: { icon: "/brand/icon-192.png", apple: "/brand/apple-touch-icon.png" },
 };
 
-export const viewport: Viewport = { themeColor: "#123059" };
+export const viewport: Viewport = { themeColor: "#fef9ec" };
 
 // Runs before first paint: marks JS and motion support so the loader covers the page from the very first frame.
 // If hydration never finishes, the safety timer releases the page after 6s.
