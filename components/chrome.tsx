@@ -48,14 +48,13 @@ export function Header() {
   return (
     <>
       <a className="skip" href="#story">Skip to content</a>
-      <header className="site-header" data-tone="dark">
+      {/* Symmetric, after themacallan.com: menu on the left, the wordmark centred, the shop on the right */}
+      <header className="site-header" data-tone="light">
+        <button ref={trigger} type="button" className="menu-btn" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} aria-controls="menu" onClick={() => setOpen((v) => !v)}>
+          <span className="bars" aria-hidden="true"><i /><i /></span><span>{open ? "Close" : "Menu"}</span>
+        </button>
         <a href="#top" className="brand" aria-label="Tomatin Distillery, back to top"><Logo /></a>
-        <nav aria-label="Main">
-          <A href={url("/shop/")} className="nav-link">Shop</A>
-          <button ref={trigger} type="button" className="menu-btn" aria-expanded={open} aria-controls="menu" onClick={() => setOpen((v) => !v)}>
-            <span>{open ? "Close" : "Menu"}</span><span className="bars" aria-hidden="true"><i /><i /></span>
-          </button>
-        </nav>
+        <A href={url("/shop/")} className="nav-link">Shop</A>
       </header>
       <div id="menu" ref={panel} className="menu" role="dialog" aria-modal="true" aria-label="Menu" data-open="false">
         <div className="menu-bg" aria-hidden="true" />

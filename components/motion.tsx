@@ -81,7 +81,7 @@ export function usePageMotion() {
       if (header) {
         const probe = header.offsetHeight / 2;
         const under = tones.find((t) => { const r = t.getBoundingClientRect(); return r.top <= probe && r.bottom > probe; });
-        header.dataset.tone = under?.dataset.tone ?? "dark";
+        header.dataset.tone = under?.dataset.tone ?? "light";
         const down = y > last + 4;
         const up = y < last - 4;
         if (y < 80 || up) header.dataset.hidden = "false";

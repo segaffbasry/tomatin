@@ -32,6 +32,7 @@ const files = [
   // story (high-resolution originals of the live mega-menu images)
   [U + "2024/03/DSC02947-scaled.jpg-1.webp", "public/media/story/moor.webp"],
   [U + "2024/02/7R405798-1-copy.webp", "public/media/story/stills.webp"],
+  [U + "2024/02/420172544_1394530824491337_4393652451417962133_n-1-copy.webp", "public/media/story/environment.webp"],
   [U + "2023/11/7R405431-1-copy-768x512.webp", "public/media/brands/tomatin-2.webp"],
   [U + "2023/12/cu-bocan-matured-experimental-casks-2-copy.webp", "public/media/brands/cu-bocan.webp"],
   [U + "2024/06/ANTIQUARY_MASTER_BOTTLE_BOTTLE_SHOT_21YO_JPG-copy.webp", "public/media/brands/antiquary-2.webp"],

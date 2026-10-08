@@ -2,138 +2,157 @@
 
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { Button, reducedMotion } from "@/components/ui";
+import { Button, Rich, reducedMotion } from "@/components/ui";
 import { hero } from "@/lib/content";
 
-type Now = { t: number; wind: number; hum: number } | null;
+const SLIDE_MS = 7000;
 
-/* Live conditions at the distillery, after the vineyard weather card on moncalisse.com, set as a quiet line in the beige bar.
-   Open-Meteo needs no key and sends no visitor data. If the request fails the bar still shows the place, coordinates and local time. */
+/* A small caption in the frame's corner with the conditions at the distillery right now (Open-Meteo, no key, no visitor data). */
 function Conditions() {
-  const [now, setNow] = useState<Now>(null);
+  const [temp, setTemp] = useState<number | null>(null);
   const [time, setTime] = useState("");
   useEffect(() => {
     const { lat, lon } = hero.place;
     const ctrl = new AbortController();
-    fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m&wind_speed_unit=ms&timezone=Europe%2FLondon`, { signal: ctrl.signal })
+    fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m&timezone=Europe%2FLondon`, { signal: ctrl.signal })
       .then((r) => (r.ok ? r.json() : null))
-      .then((d) => { const c = d?.current; if (c) setNow({ t: c.temperature_2m, wind: c.wind_speed_10m, hum: c.relative_humidity_2m }); })
+      .then((d) => { const t = d?.current?.temperature_2m; if (typeof t === "number") setTemp(t); })
       .catch(() => {});
     const clock = () => setTime(new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/London" }).format(new Date()));
     clock();
     const id = window.setInterval(clock, 30000);
     return () => { ctrl.abort(); window.clearInterval(id); };
   }, []);
-  return (
-    <div className="cover-bar-inner" aria-label={`Now at ${hero.place.name}`}>
-      <p className="cover-place"><span className="dot" aria-hidden="true" />{hero.place.name}<span className="cover-coords">{hero.place.latLabel}, {hero.place.lonLabel}</span></p>
-      <p className="cover-now">
-        {now && <span className="cover-temp">{now.t.toFixed(1)}°C</span>}
-        {now && <span className="cover-extra">Wind {now.wind.toFixed(1)} m/s</span>}
-        {now && <span className="cover-extra">Humidity {Math.round(now.hum)}%</span>}
-        <span>{time} in Tomatin</span>
-      </p>
-    </div>
-  );
+  return <p className="cover-now">{hero.place.name}{temp !== null && <span>{temp.toFixed(1)}°C</span>}<span>{time}</span></p>;
 }
 
-/* The front cover. Not their full-bleed film: a cream page with a beige bar of live conditions under the header, the script
-   statement and actions on the left, and the brand film playing inside a tall arch on the right, like a still-house window.
-   With motion allowed the film is laid full-bleed underneath and clipped to the arch; scrolling opens the arch out to the
-   whole section before the story begins. Without that (reduced motion, no JavaScript) the film simply stays in its arch.
-   Muted, loops, pauses off screen, has a pause control and a local poster. The entrance starts on `intro:done`. */
+/* The cover, after the hero on themacallan.com: restraint rather than spectacle. A framed picture on cream under a centred logo,
+   four chapters that change on their own (the brand film first), a small label, a quiet serif title and one action,
+   numbered indicators whose line fills while a chapter is showing. It stops advancing once a visitor picks a chapter,
+   and never advances with reduced motion. The entrance starts on `intro:done`. */
 export function Hero() {
+  const slides = hero.slides;
   const stage = useRef<HTMLElement>(null);
-  const slot = useRef<HTMLDivElement>(null);
-  const film = useRef<HTMLDivElement>(null);
+  const text = useRef<HTMLDivElement>(null);
   const video = useRef<HTMLVideoElement>(null);
+  const [i, setI] = useState(0);
+  const [auto, setAuto] = useState(false);
+  const [ready, setReady] = useState(false);
   const [playing, setPlaying] = useState(false);
   const manualPause = useRef(false);
+  const first = useRef(true);
 
+  /* Autoplay only after the entrance, only with motion allowed, and pauses while the pointer or focus is inside. */
+  useEffect(() => {
+    const go = () => { setReady(true); setAuto(!reducedMotion()); };
+    if (document.documentElement.dataset.intro === "done") go();
+    else document.addEventListener("intro:done", go, { once: true });
+    return () => document.removeEventListener("intro:done", go);
+  }, []);
+  const [hold, setHold] = useState(false);
+  useEffect(() => {
+    if (!auto || !ready || hold) return;
+    const t = window.setTimeout(() => setI((n) => (n + 1) % slides.length), SLIDE_MS);
+    return () => window.clearTimeout(t);
+  }, [i, auto, ready, hold, slides.length]);
+
+  /* The film plays only while its chapter is showing and the cover is on screen. */
   useEffect(() => {
     const v = video.current;
     if (!v) return;
     v.muted = true;
-    if (reducedMotion()) { manualPause.current = true; return; }
-    v.play().catch(() => setPlaying(false));
-  }, []);
-
+    if (i === 0 && !manualPause.current && !reducedMotion()) v.play().catch(() => {}); else v.pause();
+  }, [i]);
   useEffect(() => {
     const el = stage.current, v = video.current;
     if (!el || !v) return;
-    const io = new IntersectionObserver(([entry]) => {
-      if (!entry.isIntersecting) v.pause();
-      else if (!manualPause.current) v.play().catch(() => {});
+    const io = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) v.pause();
+      else if (i === 0 && !manualPause.current && !reducedMotion()) v.play().catch(() => {});
     });
     io.observe(el);
     return () => io.disconnect();
-  }, []);
+  }, [i]);
 
+  /* Copy for the new chapter rises in. */
   useEffect(() => {
-    const el = stage.current, s = slot.current, f = film.current;
-    if (!el || !s || !f || reducedMotion()) return;
+    if (first.current) { first.current = false; return; }
+    if (reducedMotion() || !text.current) return;
+    gsap.fromTo(text.current.children, { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.9, stagger: 0.07, ease: "tm" });
+  }, [i]);
+
+  /* Entrance and a gentle scroll-out: the frame opens from a smaller inset; on scroll the picture drifts and the copy lifts. */
+  useEffect(() => {
+    const el = stage.current;
+    if (!el || reducedMotion()) return;
     gsap.registerPlugin(ScrollTrigger);
-
-    /* The arch, expressed as a clip on the full-bleed film: the slot's edges measured from the section's edges. */
-    const arch = () => {
-      const h = el.getBoundingClientRect(), r = s.getBoundingClientRect();
-      const rad = r.width / 2;
-      return `inset(${r.top - h.top}px ${h.right - r.right}px ${h.bottom - r.bottom}px ${r.left - h.left}px round ${rad}px ${rad}px 0px 0px)`;
-    };
-    el.classList.add("is-open-able");
-    gsap.set(f, { clipPath: arch() });
-
-    let open: gsap.core.Tween | null = null;
+    const frame = el.querySelector(".cover-frame");
+    const tweens: (gsap.core.Tween | gsap.core.Timeline)[] = [];
     const run = () => {
-      gsap.timeline()
-        .fromTo(f, { opacity: 0 }, { opacity: 1, duration: 1.2, ease: "tm" }, 0)
-        .fromTo(f.querySelector("video"), { scale: 1.12 }, { scale: 1, duration: 2, ease: "tm" }, 0)
-        .fromTo(el.querySelectorAll(".cover-copy > *"), { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 1, stagger: 0.09, ease: "tm", clearProps: "transform" }, 0.1)
-        .fromTo(el.querySelector(".cover-bar"), { yPercent: -100, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 0.8, ease: "tm" }, 0.2);
-      open = gsap.fromTo(f, { clipPath: arch }, {
-        clipPath: "inset(0px 0px 0px 0px round 0px 0px 0px 0px)",
-        ease: "none",
-        scrollTrigger: {
-          trigger: el, start: "top top", end: "bottom 35%", scrub: true, invalidateOnRefresh: true,
-          onUpdate: (self) => { el.dataset.tone = self.progress > 0.45 ? "dark" : "light"; },
-        },
-      });
-      gsap.to(el.querySelector(".cover-copy"), { opacity: 0, y: -60, ease: "none", scrollTrigger: { trigger: el, start: "top top", end: "40% top", scrub: true } });
+      tweens.push(gsap.timeline()
+        .fromTo(frame, { clipPath: "inset(7% 7% 7% 7%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 1.5, ease: "tm" }, 0)
+        .fromTo(el.querySelector(".cover-media"), { scale: 1.14 }, { scale: 1, duration: 2.2, ease: "tm" }, 0)
+        .fromTo(el.querySelectorAll(".cover-text > *, .cover-dots, .cover-now, .cover-control"), { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 1, stagger: 0.07, ease: "tm", clearProps: "transform" }, 0.45));
+      tweens.push(gsap.to(el.querySelector(".cover-media"), { yPercent: 8, ease: "none", scrollTrigger: { trigger: el, start: "top top", end: "bottom top", scrub: true } }));
+      tweens.push(gsap.to(el.querySelector(".cover-text"), { y: -40, opacity: 0, ease: "none", scrollTrigger: { trigger: el, start: "top top", end: "60% top", scrub: true } }));
     };
     if (document.documentElement.dataset.intro === "done") run();
     else document.addEventListener("intro:done", run, { once: true });
-    return () => { document.removeEventListener("intro:done", run); open?.scrollTrigger?.kill(); open?.kill(); el.classList.remove("is-open-able"); };
+    return () => { document.removeEventListener("intro:done", run); tweens.forEach((t) => { t.scrollTrigger?.kill(); t.kill(); }); };
   }, []);
 
+  const pick = (n: number) => { setAuto(false); setI(n); };
+  const onKey = (e: React.KeyboardEvent) => {
+    const next = e.key === "ArrowRight" ? i + 1 : e.key === "ArrowLeft" ? i - 1 : null;
+    if (next === null) return;
+    e.preventDefault();
+    const to = (next + slides.length) % slides.length;
+    pick(to);
+    requestAnimationFrame(() => document.getElementById(`cover-tab-${to}`)?.focus());
+  };
   const toggle = () => {
     const v = video.current;
     if (!v) return;
     if (v.paused) { manualPause.current = false; v.play().catch(() => {}); } else { manualPause.current = true; v.pause(); }
   };
 
+  const s = slides[i];
   return (
-    <section ref={stage} className="cover" id="top" data-tone="light" aria-label="Introduction">
-      <div className="cover-bar hero-anim"><Conditions /></div>
-      <div className="cover-grid">
-        <div className="cover-copy hero-anim">
-          <p className="eyebrow">{hero.eyebrow}</p>
-          <h1>{hero.title}</h1>
-          <div className="hero-actions">
-            <Button href={hero.primary.href} tone="gold">{hero.primary.label}</Button>
-            <Button href={hero.secondary.href} tone="light">{hero.secondary.label}</Button>
-          </div>
-          <button type="button" className="hero-control" onClick={toggle} aria-pressed={!playing} aria-label={playing ? "Pause background film" : "Play background film"}>
+    <section ref={stage} className="cover" id="top" data-tone="light" aria-roledescription="carousel" aria-label="Tomatin Distillery"
+      onMouseEnter={() => setHold(true)} onMouseLeave={() => setHold(false)} onFocus={() => setHold(true)} onBlur={() => setHold(false)}>
+      <h1 className="sr-only">Tomatin Distillery, award-winning Highland single malt Scotch whisky</h1>
+      <div className="cover-frame hero-anim">
+        <div className="cover-media">
+          {slides.map((t, n) => (
+            <div key={t.title} className={`cv-layer${n === i ? " is-active" : ""}`} aria-hidden={n === i ? undefined : true}>
+              {t.kind === "film"
+                ? <video ref={video} src={hero.film} poster={hero.poster} muted loop playsInline preload="auto" aria-hidden="true" onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} />
+                : <Image src={t.image!} alt={n === i ? t.alt! : ""} fill sizes="100vw" priority={n === 1} />}
+            </div>
+          ))}
+        </div>
+        <div className="cover-shade" aria-hidden="true" />
+        <Conditions />
+        <div className="cover-text" ref={text} id="cover-panel" role="tabpanel" aria-labelledby={`cover-tab-${i}`} aria-live={auto ? "off" : "polite"}>
+          <p className="eyebrow">{s.label}</p>
+          <h2 className="cover-title"><Rich text={s.title} /></h2>
+          <Button href={s.cta.href} tone="dark">{s.cta.label}</Button>
+        </div>
+        <div className="cover-dots" role="tablist" aria-label="Chapters" onKeyDown={onKey}>
+          {slides.map((t, n) => (
+            <button key={t.title} id={`cover-tab-${n}`} type="button" role="tab" aria-selected={n === i} aria-controls="cover-panel" tabIndex={n === i ? 0 : -1} aria-label={t.title.replace(/\*/g, "")}
+              onClick={() => pick(n)} data-run={n === i && auto && ready && !hold ? "true" : undefined}>
+              <span>{String(n + 1).padStart(2, "0")}</span><i key={`${i}-${n}`} aria-hidden="true" />
+            </button>
+          ))}
+        </div>
+        {s.kind === "film" && (
+          <button type="button" className="cover-control" onClick={toggle} aria-pressed={!playing} aria-label={playing ? "Pause film" : "Play film"}>
             <svg viewBox="0 0 10 12" aria-hidden="true">{playing ? <path d="M0 0h3.5v12H0zM6.5 0H10v12H6.5z" /> : <path d="M0 0l10 6-10 6z" />}</svg>
-            <span>{playing ? "Pause film" : "Play film"}</span>
           </button>
-        </div>
-        <div className="cover-slot" ref={slot}>
-          <div className="cover-film" ref={film}>
-            <video ref={video} src={hero.film} poster={hero.poster} muted loop playsInline preload="auto" aria-hidden="true"
-              onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} />
-          </div>
-        </div>
+        )}
       </div>
     </section>
   );

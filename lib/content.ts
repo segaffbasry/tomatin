@@ -9,6 +9,14 @@ export const hero = {
   poster: "/media/hero/poster.jpg",
   primary: { label: "Discover Our Whisky", href: url("/tomatin/our-whisky/") },
   secondary: { label: "Book a Tour", href: url("/tours/") },
+  /* The cover is a framed carousel of four chapters (after the hero on themacallan.com). Titles and links are Tomatin's own:
+     the brand line, the newest release and tours from the live news, and Our Environment from the live navigation. */
+  slides: [
+    { label: "Award-winning Highland single malt Scotch whisky", title: "To what *matters*", cta: { label: "Discover our whisky", href: url("/tomatin/our-whisky/") }, kind: "film" as const },
+    { label: "New release", title: "Introducing Tomatin 2011 Single Cask", cta: { label: "Explore", href: url("/blog/whisky-lifestyle/introducing-tomatin-2011-single-cask-uk-exclusive/") }, kind: "image" as const, image: "/media/news/single-cask-2011.jpg", alt: "A bottle of Tomatin 2011 Single Cask on a wooden box beside a fire" },
+    { label: "Visit", title: "Tomatin Distillery Tours", cta: { label: "Book a tour", href: url("/tours/") }, kind: "image" as const, image: "/media/brands/tomatin-distillery.jpg", alt: "A stillman at work in the warm light of the still house" },
+    { label: "Discover", title: "Our Environment", cta: { label: "Explore", href: url("/our-environment/") }, kind: "image" as const, image: "/media/story/environment.webp", alt: "A path through Scots pine forest near the distillery" },
+  ],
   // Live conditions at the distillery (Open-Meteo, keyless). Coordinates of Tomatin Distillery, Inverness-shire.
   place: { name: "Tomatin Distillery", lat: 57.3366, lon: -4.0127, latLabel: "57.34° N", lonLabel: "4.01° W" },
 };
